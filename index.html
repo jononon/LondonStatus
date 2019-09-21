@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script
+		src="https://code.jquery.com/jquery-3.4.1.min.js"
+		integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+		crossorigin="anonymous"></script>
+	<title>London Status Page</title>
+</head>
+<body>
+	<div id=vauxhallug></div>
+
+</body>
+<script>
+
+	function updateVauxhallUG () {
+		var settings = {
+		  "async": true,
+		  "crossDomain": true,
+		  "url": "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUVXL?app_id=f6fd954e&app_key=bb3ce2b909c15f37bc01074996d7b9c3",
+		  "method": "GET",
+		  "headers": {
+		    "User-Agent": "PostmanRuntime/7.16.3",
+		    "Accept": "*/*",
+		    "Cache-Control": "no-cache",
+		    "Postman-Token": "c69372dc-d4cf-47d4-826f-fd6527509173,23c7dbd6-052a-4831-9e6b-973afd67c78e",
+		    "Host": "api.tfl.gov.uk",
+		    "Accept-Encoding": "gzip, deflate",
+		    "Cookie": "__cfduid=da0994adf2abdd6ffb6f1410dcf6eebf71565910925",
+		    "Connection": "keep-alive",
+		    "cache-control": "no-cache"
+		  }
+		}
+
+		$.ajax(settings).done(function (response) {
+		  console.log(response);
+		});
+	}
+
+</script>
+</html>
