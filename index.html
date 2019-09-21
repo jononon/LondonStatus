@@ -11,30 +11,39 @@
 	<div id=vauxhallug></div>
 
 </body>
+
+<!-- The core Firebase JS SDK is always required and must be listed first -->
+<script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-app.js"></script>
+
+<!-- TODO: Add SDKs for Firebase products that you want to use
+     https://firebase.google.com/docs/web/setup#available-libraries -->
+
+<script>
+  // Your web app's Firebase configuration
+  var firebaseConfig = {
+    apiKey: "AIzaSyBe64SoekRLaf4lKoBd62OCXmsb6SQqh3Y",
+    authDomain: "londonstatus-74ab5.firebaseapp.com",
+    databaseURL: "https://londonstatus-74ab5.firebaseio.com",
+    projectId: "londonstatus-74ab5",
+    storageBucket: "",
+    messagingSenderId: "37034092587",
+    appId: "1:37034092587:web:93dd3c9dea1671cef3626e"
+  };
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+</script>
+
 <script>
 
 	function updateVauxhallUG () {
-		var settings = {
-		  "async": true,
-		  "crossDomain": true,
-		  "url": "https://api.tfl.gov.uk/Line/victoria/Arrivals/940GZZLUVXL?app_id=f6fd954e&app_key=bb3ce2b909c15f37bc01074996d7b9c3",
-		  "method": "GET",
-		  "headers": {
-		    "User-Agent": "PostmanRuntime/7.16.3",
-		    "Accept": "*/*",
-		    "Cache-Control": "no-cache",
-		    "Postman-Token": "c69372dc-d4cf-47d4-826f-fd6527509173,23c7dbd6-052a-4831-9e6b-973afd67c78e",
-		    "Host": "api.tfl.gov.uk",
-		    "Accept-Encoding": "gzip, deflate",
-		    "Cookie": "__cfduid=da0994adf2abdd6ffb6f1410dcf6eebf71565910925",
-		    "Connection": "keep-alive",
-		    "cache-control": "no-cache"
-		  }
-		}
-
-		$.ajax(settings).done(function (response) {
-		  console.log(response);
+		var addMessage = firebase.functions().httpsCallable('addMessage');
+		addMessage().then(function(result) {
+			console.log(result);
+		  // Read result of the Cloud Function.
+		  // var sanitizedMessage = result.data.text;
+		  // ...
 		});
+
 	}
 
 </script>
