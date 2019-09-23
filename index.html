@@ -13,8 +13,22 @@
 	<title>London Status Page</title>
 </head>
 <body>
-	<div id=vauxhallug></div>
-
+	<div id=vauxhallug class=container-fluid style="position:fixed;"></div>
+	<div id=vauxhallnr class=container-fluid style="position:fixed;"></div>
+	<div id=busDepartures class=container-fluid style="position:fixed;">
+		<h3>Local Bus Departures <img src='images/buses-partner.png' width='30' height='25' align='middle'></h3>
+		<div class=row>
+			<div class="col-sm-3" id=busA></div>
+			<div class="col-sm-3" id=busB></div>
+			<div class="col-sm-3" id=busC></div>
+			<div class="col-sm-3" id=busD></div>
+			<div class="col-sm-3" id=busE></div>
+			<div class="col-sm-3" id=busF></div>
+			<div class="col-sm-3" id=busG></div>
+			<div class="col-sm-3" id=busJ></div>
+			<div class="col-sm-3" id=busX></div>
+		</div>
+	</div>
 </body>
 
 <!-- The core Firebase JS SDK is always required and must be listed first -->
@@ -25,30 +39,226 @@
 	<script src="https://www.gstatic.com/firebasejs/6.6.2/firebase-functions.js"></script>
 
 <script>
-  // Your web app's Firebase configuration
-  var firebaseConfig = {
-    apiKey: "AIzaSyBe64SoekRLaf4lKoBd62OCXmsb6SQqh3Y",
-    authDomain: "londonstatus-74ab5.firebaseapp.com",
-    databaseURL: "https://londonstatus-74ab5.firebaseio.com",
-    projectId: "londonstatus-74ab5",
-    storageBucket: "",
-    messagingSenderId: "37034092587",
-    appId: "1:37034092587:web:93dd3c9dea1671cef3626e"
-  };
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
-  var functions = firebase.functions();
+	// Your web app's Firebase configuration
+	var firebaseConfig = {
+		apiKey: "AIzaSyBe64SoekRLaf4lKoBd62OCXmsb6SQqh3Y",
+		authDomain: "londonstatus-74ab5.firebaseapp.com",
+		databaseURL: "https://londonstatus-74ab5.firebaseio.com",
+		projectId: "londonstatus-74ab5",
+		storageBucket: "",
+		messagingSenderId: "37034092587",
+		appId: "1:37034092587:web:93dd3c9dea1671cef3626e"
+	};
 
-  function updateVauxhallUG () {
-		var addMessage = firebase.functions().httpsCallable('updateVauxhallUG');
-		addMessage().then(function(result) {
-			console.log(result);
-		  // Read result of the Cloud Function.
-		  // var sanitizedMessage = result.data.text;
-		  // ...
-		});
+	// Initialize Firebase
+	firebase.initializeApp(firebaseConfig);
+	var functions = firebase.functions();
 
+	function compareArrivals(a, b) {
+		return a.timeToStation - b.timeToStation;
 	}
+
+	function updateVauxhallUG () {
+		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
+		addMessage({stopID: "940GZZLUVXL"}).then(function(result) {
+			var output = JSON.parse(result.data);
+			console.log(output);
+
+			var platform1 = [];
+			var platform2 = [];
+
+			for (var i = 0; i < output.length; i++) {
+				if(output[i].platformName == "Northbound - Platform 1") {
+					platform1.push(output[i]);
+				} else {
+					platform2.push(output[i]);
+				}
+			}
+
+			platform1.sort(compareArrivals);
+			platform2.sort(compareArrivals);
+
+			console.log(platform1);
+
+			var html = "<h3>Vauxhall Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'></h3><div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Northbound</small></h4><table width='100%'><tbody>";
+
+			for (var i = 0; i < Math.min(platform1.length,6); i++) {
+				html += "<tr><td>"+platform1[i].towards+"</td><td style='text-align:right;'>"+Math.round(platform1[i].timeToStation/60)+" mins</td></tr>";
+			}
+
+			html += "</tbody></table></div><div class='col'><h4>Platform 2 <small class='text-muted'>Southbound</small></h4><table width='100%'><tbody>";
+
+			for (var i = 0; i < Math.min(platform2.length,6); i++) {
+				html += "<tr><td>"+platform2[i].towards+"</td><td style='text-align:right;'>"+Math.round(platform2[i].timeToStation/60)+" mins</td></tr>";
+			}
+
+			html += "</tbody></table></div></div></div>";
+
+			$("#vauxhallug").html(html);
+
+
+		});
+	}
+
+	function updateVauxhallNR () {
+		var addMessage = firebase.functions().httpsCallable('updateVauxhallNR');
+		addMessage({}).then(function(result) {
+			var output = JSON.parse(result.data);
+			console.log(output);
+			var output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
+			console.log(output);
+
+			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'></h3><div class='container-fluid'><table width='100%'><tbody>";
+
+			for (var i = 0; i < output.length; i++) {
+				var etdHTML = "";
+				var timeString = "";
+				if (output[i]["lt4:etd"]["_text"] == "Cancelled") {
+					break;
+				}
+				else if (output[i]["lt4:etd"]["_text"] == "On time") {
+					etdHTML = "<p class='text-success'>"+output[i]["lt4:std"]["_text"]+"</p>";
+					timeString = output[i]["lt4:std"]["_text"];
+				} 
+				// else if(output[i]["lt4:etd"]["_text"] == "Delayed") {
+				// 	etdHTML = "<p class='text-danger'><s>"+output[i]["lt4:std"]["_text"]+"</s></p>";
+				// } 
+				else {
+					etdHTML = "<p class='text-danger'>"+output[i]["lt4:etd"]["_text"]+" <small class='text-muted'><s>"+output[i]["lt4:std"]["_text"]+"</s></small></p>";
+					timeString = output[i]["lt4:etd"]["_text"];
+				}
+
+				var currentDate = new Date();
+				var etdDate = new Date();
+
+				etdDate.setHours(timeString.substring(0,2));
+				etdDate.setMinutes(timeString.substring(3,5));
+				etdDate.setSeconds(0);
+				etdDate.setMilliseconds(0);
+
+				var minutesUntil = (etdDate-currentDate)/1000;
+				if(minutesUntil < 30) {
+					minutesUntil = "Due";
+				} else {
+					minutesUntil = ""+Math.round(minutesUntil/60)+" mins";
+				}
+
+				var subsequentPointsString = "Calling at ";
+				var subsequentPointsArray = output[i]["lt5:subsequentCallingPoints"]["lt4:callingPointList"]["lt4:callingPoint"];
+
+				if(subsequentPointsArray.length == undefined) {
+					subsequentPointsString += output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"] +" only."
+				}
+
+				for (var j = 0; j < subsequentPointsArray.length; j++) {
+					subsequentPointsString += subsequentPointsArray[j]["lt4:locationName"]["_text"];
+					if(j == subsequentPointsArray.length-1) {
+						subsequentPointsString += ".";
+					} else if (j == subsequentPointsArray.length - 2) {
+						subsequentPointsString += ", and ";
+					} else {
+						subsequentPointsString += ", "
+					}
+				}
+
+				html += "<tr><td>"+etdHTML+"</td><td>"+output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"]+"</td><td>Platform "+output[i]["lt4:platform"]["_text"]+"</td><td width='30%'><marquee>"+subsequentPointsString+"</marquee></td><td style='text-align:right;'>"+minutesUntil+"</td></tr>"
+			}
+
+			html += "</tbody></table></div>";
+
+			$("#vauxhallnr").html(html);
+		});
+	}
+
+	function updateBus (stopID) {
+		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
+		addMessage({stopID: stopID}).then(function(result) {
+			var output = JSON.parse(result.data);
+			console.log(output);
+
+			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3></div><div class='card-body'>";
+
+			var departuresDictionary = {};
+
+			for (var i = 0; i < output.length; i++) {
+				if(departuresDictionary[output[i].lineName + " to " + output[i].destinationName] == undefined) {
+					departuresDictionary[output[i].lineName + " to " + output[i].destinationName] = [];
+				}
+				departuresDictionary[output[i].lineName + " to " + output[i].destinationName].push(output[i]);
+			}
+
+			for (var index in departuresDictionary) {
+				departuresDictionary[index].sort(compareArrivals);
+				cardHTML += "<p><b>"+index+"</b><br>";
+				for (var j = 0; j < departuresDictionary[index].length; j++) {
+					cardHTML += ""+Math.max(Math.round(departuresDictionary[index][j].timeToStation/60),0)+" mins";
+					if(j == departuresDictionary[index].length-1) {
+						cardHTML += ". </p>";
+					} else {
+						cardHTML += ", ";
+					}
+				}
+			}
+
+			console.log(departuresDictionary);
+
+			    
+			cardHTML += "</div></div>"
+
+			$("#bus"+output[0].platformName).html(cardHTML);
+		});
+	}
+
+	function updateAllBuses () {
+		var stopIDs = [
+			"490000247A",
+			"490000247B",
+			"490000247C",
+			"490000247D",
+			"490000247E",
+			"490000247F",
+			"490000247G1",
+			/*"490000247H", Terminating Services Only */
+			"490000247J",
+			"490005678X"
+		];
+
+		for (var i = 0; i < stopIDs.length; i++) {
+			updateBus(stopIDs[i]);
+		}
+	}
+
+	function carousel1 () {
+		$("#vauxhallnr").fadeOut();
+		$("#busDepartures").fadeOut();
+		$("#vauxhallug").fadeIn();
+		setTimeout(function(){ carousel2(); }, 5000);
+	}
+
+	function carousel2 () {
+		$("#vauxhallnr").fadeIn();
+		$("#busDepartures").fadeOut();
+		$("#vauxhallug").fadeOut();
+		setTimeout(function(){ carousel3(); }, 5000);
+	}
+
+	function carousel3 () {
+		$("#vauxhallnr").fadeOut();
+		$("#busDepartures").fadeIn();
+		$("#vauxhallug").fadeOut();
+		setTimeout(function(){ carousel1(); }, 5000);
+	}
+
+	function updateAll () {
+		updateVauxhallUG();
+		updateVauxhallNR();
+		updateAllBuses();
+	}
+
+	updateAll();
+	carousel1();
+	setInterval(updateAll, 15000);
+
 </script>
 
 </html>
