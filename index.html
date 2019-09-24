@@ -160,18 +160,60 @@
 
 			$("#vauxhallugstatus").html(statusHTML);
 
-		console.log(output);
 		});
 		
+	}
+
+	function getSecondsUntilArrival(a) {
+		var timeString;
+		if(a["lt4:etd"] != undefined) {
+			timeString = a["lt4:etd"]["_text"];
+		} else {
+			timeString = a["lt4:std"]["_text"];
+		}
+
+		if(timeString == "Delayed") {
+			return 100000;
+		}
+		
+		var currentDate = new Date();
+		var etdDate = new Date();
+
+		if(timeString.substring(0,2)< currentDate.getHours() && currentDate.getHours()==23 && currentDate.getMiinutes()>30) {
+			etdDate.setDate(currentDate.getDate()+1);
+		}
+
+		etdDate.setHours(timeString.substring(0,2));
+		etdDate.setMinutes(timeString.substring(3,5));
+		etdDate.setSeconds(0);
+		etdDate.setMilliseconds(0);
+
+		var secondsUntil = (etdDate-currentDate)/1000;
+		return secondsUntil;
+
+	}
+
+	function compareNRArrivalTimes(a,b) {
+		return getSecondsUntilArrival(a) - getSecondsUntilArrival(b);
 	}
 
 	function updateVauxhallNR () {
 		var addMessage = firebase.functions().httpsCallable('updateVauxhallNR');
 		addMessage({}).then(function(result) {
 			var output = JSON.parse(result.data);
+			console.log(output);
+			var stationMessage = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"];
 			output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
 
-			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'><span style='float:right;' class=time></span></h3><div class='container-fluid'><table width='100%'><tbody>";
+			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'><span style='float:right;' class=time></span></h3>";
+
+			if(stationMessage != undefined) {
+				html +="<div class='alert alert-danger' role='alert'>"+stationMessage+"</div>";
+			}
+
+			html += "<div class='container-fluid'><table class='table table-sm' width='100%'><thead><tr><th scope=col>Time</th><th scope=col>Destination</th><th scope=col>Platform</th><th scope=col>Status</th><th scope=col style='text-align:right;'>ETA</th></tr></thead><tbody>";
+
+			output.sort(compareNRArrivalTimes)
 
 			for (var i = 0; i < output.length; i++) {
 				var etdHTML = "";
@@ -180,14 +222,14 @@
 					continue;
 				}
 				else if (output[i]["lt4:etd"]["_text"] == "On time") {
-					etdHTML = "<p class='text-success'>"+output[i]["lt4:std"]["_text"]+"</p>";
+					etdHTML = "<p class='text-success' style='margin-bottom:0px;'>"+output[i]["lt4:std"]["_text"]+"</p>";
 					timeString = output[i]["lt4:std"]["_text"];
 				} 
 				// else if(output[i]["lt4:etd"]["_text"] == "Delayed") {
 				// 	etdHTML = "<p class='text-danger'><s>"+output[i]["lt4:std"]["_text"]+"</s></p>";
 				// } 
 				else {
-					etdHTML = "<p class='text-danger'>"+output[i]["lt4:etd"]["_text"]+" <small class='text-muted'><s>"+output[i]["lt4:std"]["_text"]+"</s></small></p>";
+					etdHTML = "<p class='text-danger' style='margin-bottom:0px;'>"+output[i]["lt4:etd"]["_text"]+" <small class='text-muted'><s>"+output[i]["lt4:std"]["_text"]+"</s></small></p>";
 					timeString = output[i]["lt4:etd"]["_text"];
 				}
 
@@ -232,12 +274,26 @@
 					}
 				}
 
-				html += "<tr><td>"+etdHTML+"</td><td>"+output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"]+"</td><td>Platform "+output[i]["lt4:platform"]["_text"]+"</td><td width='30%'><marquee>"+subsequentPointsString+"</marquee></td><td style='text-align:right;'>"+minutesUntil+"</td></tr>"
+				var delayReason;
+				if(output[i]["lt4:delayReason"] == undefined) {
+					delayReason = "";
+				} else {
+					delayReason = output[i]["lt4:delayReason"]["_text"];
+				}
+
+				html += "<tr><td>"+etdHTML+"</td><td>"+output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"]+"</td><td>Platform "+output[i]["lt4:platform"]["_text"]+"</td><td width='30%'><marquee>"+delayReason+"</marquee></td><td style='text-align:right;'>"+minutesUntil+"</td></tr>"
+
+				// if(output[i]["lt4:delayReason"] != undefined) {
+					// html += "<tr valign='height:5px;'><td colspan=5 valign='top'><small class='text-muted'>"+output[i]["lt4:delayReason"]["_text"]+"</small></td></tr>";
+				// }
+				html += "<tr><td colspan=5 style='vertical-align:top;border-top-width:0px'><small class='text-muted'>"+subsequentPointsString+"</small></td></tr>";
+				
 			}
 
 			html += "</tbody></table></div>";
 
 			$("#vauxhallnr").html(html);
+			console.log(output);
 		});
 	}
 
