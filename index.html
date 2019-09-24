@@ -13,10 +13,15 @@
 	<title>London Status Page</title>
 </head>
 <body>
-	<div id=vauxhallug class=container-fluid style="position:fixed;"></div>
+	<div id=vauxhallug class=container-fluid style="position:fixed;">
+		<h3>Vauxhall Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
+		<div id=vauxhallugdepartures class=container-fluid></div>
+		<h3>Underground Status</h3>
+		<div id=vauxhallugstatus class=container-fluid></div>
+	</div>
 	<div id=vauxhallnr class=container-fluid style="position:fixed;"></div>
 	<div id=busDepartures class=container-fluid style="position:fixed;">
-		<h3>Local Bus Departures <img src='images/buses-partner.png' width='30' height='25' align='middle'></h3>
+		<h3>Local Bus Departures <img src='images/buses-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
 		<div class=row>
 			<div class="col-sm-3" id=busA></div>
 			<div class="col-sm-3" id=busB></div>
@@ -59,10 +64,9 @@
 	}
 
 	function updateVauxhallUG () {
-		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
-		addMessage({stopID: "940GZZLUVXL"}).then(function(result) {
+		var updateStoppoint = firebase.functions().httpsCallable('updateStoppoint');
+		updateStoppoint({stopID: "940GZZLUVXL"}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
 
 			var platform1 = [];
 			var platform2 = [];
@@ -78,9 +82,7 @@
 			platform1.sort(compareArrivals);
 			platform2.sort(compareArrivals);
 
-			console.log(platform1);
-
-			var html = "<h3>Vauxhall Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'></h3><div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Northbound</small></h4><table width='100%'><tbody>";
+			var html = "<div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Northbound</small></h4><table width='100%'><tbody>";
 
 			for (var i = 0; i < Math.min(platform1.length,6); i++) {
 				html += "<tr><td>"+platform1[i].towards+"</td><td style='text-align:right;'>"+Math.round(platform1[i].timeToStation/60)+" mins</td></tr>";
@@ -94,27 +96,88 @@
 
 			html += "</tbody></table></div></div></div>";
 
-			$("#vauxhallug").html(html);
-
+			$("#vauxhallugdepartures").html(html);
 
 		});
+
+		function compareStatuses (a, b) {
+			return a.minStatus - b.minStatus;
+		}
+
+		var updateUndergroundStatus = firebase.functions().httpsCallable('updateUndergroundStatus');
+		updateUndergroundStatus({}).then(function(result) {
+			var output = JSON.parse(result.data);
+
+
+			var statusHTML = "<table class='table'><tbody>";
+
+			var impactedLines = 0;
+
+			for (var i = 0; i < output.length; i++) {
+				var min = Infinity;
+				for (var j = 0; j < output[i].lineStatuses.length; j++) {
+					min = Math.min(output[i].lineStatuses[j].statusSeverity, min);
+				}
+				output[i].minStatus = min;
+			}
+
+			output.sort(compareStatuses);
+
+			for (var i = 0; i < output.length; i++) {
+
+				if(output[i].minStatus < 5) {
+					statusHTML += "<tr class='table-danger'>";
+					impactedLines++;
+				} else if(output[i].minStatus < 10) {
+					statusHTML += "<tr class='table-warning'>";
+					impactedLines++;
+				} else {
+					continue;
+				}
+
+				statusHTML += "<th>"+output[i].name+"</th><td>";
+
+				for (var j = 0; j < output[i].lineStatuses.length; j++) {
+					statusHTML += "<p>"+output[i].lineStatuses[j].statusSeverityDescription+"</p>";
+				}
+
+				statusHTML += "</td>";
+
+				if(output[i].lineStatuses[0].reason != undefined) {
+					statusHTML += "<td>"+output[i].lineStatuses[0].reason.substring(output[i].lineStatuses[0].reason.indexOf(":")+2)+"</td></tr>";
+				} else {
+					statusHTML += "<td></td></tr>";
+				}
+			}
+
+			statusHTML += "</tbody></table>";
+
+			if(impactedLines > 0) {
+				statusHTML += "<p><strong>There is a good service on all other London Undergrond Lines.</strong></p>";
+			} else {
+				statusHTML += "<p><strong>There is a good service on all London Undergrond Lines.</strong></p>";
+			}
+
+			$("#vauxhallugstatus").html(statusHTML);
+
+		console.log(output);
+		});
+		
 	}
 
 	function updateVauxhallNR () {
 		var addMessage = firebase.functions().httpsCallable('updateVauxhallNR');
 		addMessage({}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
-			var output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
-			console.log(output);
+			output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
 
-			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'></h3><div class='container-fluid'><table width='100%'><tbody>";
+			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'><span style='float:right;' class=time></span></h3><div class='container-fluid'><table width='100%'><tbody>";
 
 			for (var i = 0; i < output.length; i++) {
 				var etdHTML = "";
 				var timeString = "";
 				if (output[i]["lt4:etd"]["_text"] == "Cancelled") {
-					break;
+					continue;
 				}
 				else if (output[i]["lt4:etd"]["_text"] == "On time") {
 					etdHTML = "<p class='text-success'>"+output[i]["lt4:std"]["_text"]+"</p>";
@@ -130,6 +193,10 @@
 
 				var currentDate = new Date();
 				var etdDate = new Date();
+
+				if(timeString.substring(0,2)< currentDate.getHours()) {
+					etdDate.setDate(currentDate.getDate()+1);
+				}
 
 				etdDate.setHours(timeString.substring(0,2));
 				etdDate.setMinutes(timeString.substring(3,5));
@@ -174,7 +241,6 @@
 		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
 		addMessage({stopID: stopID}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
 
 			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3></div><div class='card-body'>";
 
@@ -200,7 +266,6 @@
 				}
 			}
 
-			console.log(departuresDictionary);
 
 			    
 			cardHTML += "</div></div>"
@@ -232,21 +297,21 @@
 		$("#vauxhallnr").fadeOut();
 		$("#busDepartures").fadeOut();
 		$("#vauxhallug").fadeIn();
-		setTimeout(function(){ carousel2(); }, 5000);
+		setTimeout(function(){ carousel2(); }, 10000);
 	}
 
 	function carousel2 () {
 		$("#vauxhallnr").fadeIn();
 		$("#busDepartures").fadeOut();
 		$("#vauxhallug").fadeOut();
-		setTimeout(function(){ carousel3(); }, 5000);
+		setTimeout(function(){ carousel3(); }, 10000);
 	}
 
 	function carousel3 () {
 		$("#vauxhallnr").fadeOut();
 		$("#busDepartures").fadeIn();
 		$("#vauxhallug").fadeOut();
-		setTimeout(function(){ carousel1(); }, 5000);
+		setTimeout(function(){ carousel1(); }, 10000);
 	}
 
 	function updateAll () {
@@ -257,7 +322,12 @@
 
 	updateAll();
 	carousel1();
-	setInterval(updateAll, 15000);
+	setInterval(updateAll, 50000);
+
+	function updateTime() {
+		$(".time").html(new Date().toLocaleTimeString());
+	}
+	setInterval(updateTime, 1000);
 
 </script>
 
