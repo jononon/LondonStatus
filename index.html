@@ -210,6 +210,10 @@
 					minutesUntil = ""+Math.round(minutesUntil/60)+" mins";
 				}
 
+				if(minutesUntil == "NaN mins") {
+					minutesUntil = "Unknown";
+				}
+
 				var subsequentPointsString = "Calling at ";
 				var subsequentPointsArray = output[i]["lt5:subsequentCallingPoints"]["lt4:callingPointList"]["lt4:callingPoint"];
 
