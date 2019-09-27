@@ -125,7 +125,10 @@
 
 			for (var i = 0; i < output.length; i++) {
 
-				if(output[i].minStatus < 5) {
+				if(output[i].minStatus < 4) {
+					statusHTML += "<tr class='table-primary'>";
+					impactedLines++;
+				} else if(output[i].minStatus < 7) {
 					statusHTML += "<tr class='table-danger'>";
 					impactedLines++;
 				} else if(output[i].minStatus < 10) {
@@ -179,7 +182,7 @@
 		var currentDate = new Date();
 		var etdDate = new Date();
 
-		if(timeString.substring(0,2)< currentDate.getHours() && currentDate.getHours()==23 && currentDate.getMiinutes()>30) {
+		if(timeString.substring(0,2)< currentDate.getHours() && currentDate.getHours()==23 && currentDate.getMinutes()>30) {
 			etdDate.setDate(currentDate.getDate()+1);
 		}
 
@@ -202,7 +205,12 @@
 		addMessage({}).then(function(result) {
 			var output = JSON.parse(result.data);
 			console.log(output);
-			var stationMessage = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"];
+			var stationMessage;
+			if(output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"] == undefined) {
+				stationMessage = undefined;
+			} else {
+				stationMessage = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"];
+			}
 			output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
 
 			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'><span style='float:right;' class=time></span></h3>";
@@ -236,7 +244,7 @@
 				var currentDate = new Date();
 				var etdDate = new Date();
 
-				if(timeString.substring(0,2)< currentDate.getHours()) {
+				if(timeString.substring(0,2)< currentDate.getHours()  && currentDate.getHours()==23 && currentDate.getMinutes()>30) {
 					etdDate.setDate(currentDate.getDate()+1);
 				}
 
@@ -301,7 +309,10 @@
 		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
 		addMessage({stopID: stopID}).then(function(result) {
 			var output = JSON.parse(result.data);
-
+			console.log(output);
+			if (output.length == 0){
+				return;
+			}
 			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3></div><div class='card-body'>";
 
 			var departuresDictionary = {};
