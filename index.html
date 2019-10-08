@@ -169,10 +169,10 @@
 
 	function getSecondsUntilArrival(a) {
 		var timeString;
-		if(a["lt4:etd"] != undefined) {
-			timeString = a["lt4:etd"]["_text"];
-		} else {
+		if(a["lt4:etd"]["_text"] == "On time") {
 			timeString = a["lt4:std"]["_text"];
+		} else {
+			timeString = a["lt4:etd"]["_text"];
 		}
 
 		if(timeString == "Delayed") {
@@ -204,19 +204,22 @@
 		var addMessage = firebase.functions().httpsCallable('updateVauxhallNR');
 		addMessage({}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
-			var stationMessage;
+			var stationMessage = "";
 			if(output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"] == undefined) {
 				stationMessage = undefined;
+			} else if (output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"] != undefined)  {
+				stationMessage += "<div class='alert alert-danger' role='alert'>" + output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"] + "</div>";
 			} else {
-				stationMessage = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"]["_text"];
+				for (var i = 0; i < output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"].length; i++) {
+					stationMessage += "<div class='alert alert-danger' role='alert'>" + output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt4:nrccMessages"]["lt:message"][i]["_text"]+"</div>";
+				}
 			}
 			output = output["soap:Envelope"]["soap:Body"]["GetDepBoardWithDetailsResponse"]["GetStationBoardResult"]["lt5:trainServices"]["lt5:service"];
 
 			var html = "<h3>Vauxhall National Rail Departures <img src='images/nationalrail.png' width='40' height='25' align='middle'><span style='float:right;' class=time></span></h3>";
 
 			if(stationMessage != undefined) {
-				html +="<div class='alert alert-danger' role='alert'>"+stationMessage+"</div>";
+				html += stationMessage;
 			}
 
 			html += "<div class='container-fluid'><table class='table table-sm' width='100%'><thead><tr><th scope=col>Time</th><th scope=col>Destination</th><th scope=col>Platform</th><th scope=col>Status</th><th scope=col style='text-align:right;'>ETA</th></tr></thead><tbody>";
@@ -301,7 +304,6 @@
 			html += "</tbody></table></div>";
 
 			$("#vauxhallnr").html(html);
-			console.log(output);
 		});
 	}
 
@@ -309,7 +311,6 @@
 		var addMessage = firebase.functions().httpsCallable('updateStoppoint');
 		addMessage({stopID: stopID}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
 			if (output.length == 0){
 				return;
 			}
@@ -362,6 +363,14 @@
 		for (var i = 0; i < stopIDs.length; i++) {
 			updateBus(stopIDs[i]);
 		}
+	}
+
+	function updateWeather () {
+		var updateWeather = firebase.functions().httpsCallable('updateWeather');
+		updateWeather({}).then(function(result) {
+			var output = JSON.parse(result.data);
+			console.log(output);
+		});
 	}
 
 	function carousel1 () {
