@@ -12,15 +12,19 @@
 
 	<title>London Status Page</title>
 </head>
+<style>
+	html { overflow-y: hidden; }
+</style>
 <body>
-	<div id=vauxhallug class=container-fluid style="position:fixed;">
+	<div id="top"></div>
+	<div id=vauxhallug class=container-fluid >
 		<h3>Vauxhall Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
 		<div id=vauxhallugdepartures class=container-fluid></div>
 		<h3>Underground Status</h3>
 		<div id=vauxhallugstatus class=container-fluid></div>
 	</div>
-	<div id=vauxhallnr class=container-fluid style="position:fixed;"></div>
-	<div id=busDepartures class=container-fluid style="position:fixed;">
+	<div id=vauxhallnr class=container-fluid ></div>
+	<div id=busDepartures class=container-fluid >
 		<h3>Local Bus Departures <img src='images/buses-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
 		<div class=row>
 			<div class="col-sm-3" id=busA></div>
@@ -35,11 +39,12 @@
 			<div class="col-sm-3" id=busRiver></div>
 		</div>
 	</div>
-	<div id=weather class=container-fluid style="position:fixed;">
+	<div id=weather class=container-fluid >
 		<h4>Weather Updates</h4>
 		<div id=currentWeather class=container-fluid></div>
 		<div id=futureWeather class=container-fluid></div>
 	</div>
+	<div id="bottom"></div>
 </body>
 
 <!-- The core Firebase JS SDK is always required and must be listed first -->
@@ -383,7 +388,6 @@
 		var updateCurrentWeather = firebase.functions().httpsCallable('updateCurrentWeather');
 		updateFutureWeather({}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
 			var weatherHTML = "<h6>Future Projections</h6><table class='table table-sm'><thead><tr><th scope='col'>Time</th><th scope='col'>Temperature</th><th scope='col'>Conditions</th><th scope='col'>Wind</th></tr></thead><tbody>";
 
 			for (var i = 0; i < Math.min(output.list.length,9); i++) {
@@ -398,7 +402,6 @@
 
 		updateCurrentWeather({}).then(function(result) {
 			var output = JSON.parse(result.data);
-			console.log(output);
 			var weatherHTML = "<h6>Current Weather</h6><div class=row><div><h1 class='display-1'>"+Math.round(output.main.temp)+"°F</h1><p>High "+Math.round(output.main.temp_max)+", Low "+Math.round(output.main.temp_min)+"</p></div><div><img src=http://openweathermap.org/img/wn/" + output.weather[0].icon + ".png>";
 		
 
@@ -406,38 +409,62 @@
 		});
 	}
 
+	var currentScrollTimeout;
+
+	function goToBottom() {
+	    document.querySelector('#bottom').scrollIntoView({ 
+		  behavior: 'smooth' 
+		});    
+	};
+
+	function goToTop() {
+	    document.querySelector('#top').scrollIntoView({ 
+		  behavior: 'smooth' 
+		});
+	    currentScrollTimeout = setTimeout( function () { goToBottom(); }, 5000 );
+	};
+
 	var currentTimeout;
 
 	function carousel0 () {
 		$("#vauxhallnr").fadeOut();
-		$("#busDepartures").fadeOut();
+		$("#busDepartures").fadeOut(300, function() {
+			$("#weather").fadeIn();
+		});
 		$("#vauxhallug").fadeOut();
-		$("#weather").fadeIn();
 		currentTimeout = setTimeout(function(){ carousel1(); }, 10000);
+		goToTop();
 	}
 
 	function carousel1 () {
-		$("#weather").fadeOut();
-		$("#vauxhallnr").fadeOut();
-		$("#busDepartures").fadeOut();
-		$("#vauxhallug").fadeIn();
+		$("#weather").fadeOut(300, function() {
+			$("#vauxhallug").fadeIn();
+		});
+		$("#vauxhallnr").fadeOut(300);
+		$("#busDepartures").fadeOut(300);
+		
 		currentTimeout = setTimeout(function(){ carousel2(); }, 10000);
+		goToTop();
 	}
 
 	function carousel2 () {
 		$("#weather").fadeOut();
-		$("#vauxhallnr").fadeIn();
 		$("#busDepartures").fadeOut();
-		$("#vauxhallug").fadeOut();
+		$("#vauxhallug").fadeOut(300, function() {
+			$("#vauxhallnr").fadeIn();
+		});
 		currentTimeout = setTimeout(function(){ carousel3(); }, 10000);
+		goToTop();
 	}
 
 	function carousel3 () {
 		$("#weather").fadeOut();
-		$("#vauxhallnr").fadeOut();
-		$("#busDepartures").fadeIn();
+		$("#vauxhallnr").fadeOut(300, function() {
+			$("#busDepartures").fadeIn();
+		});
 		$("#vauxhallug").fadeOut();
 		currentTimeout = setTimeout(function(){ carousel0(); }, 10000);
+		goToTop();
 	}
 
 	function updateAll () {
@@ -456,18 +483,25 @@
 	}
 	setInterval(updateTime, 1000);
 
+	setTimeout(function(){ location.reload(); }, 3600000);
+
+	function clearTimeouts() {
+		clearTimeout(currentTimeout);
+		clearTimeout(currentScrollTimeout);
+	}
+
 	$(document).keypress(function(event){
 		if (event.keyCode == 119) { // 'w' weather
-			clearTimeout(currentTimeout);
+			clearTimeouts();
 			carousel0();
 		} else if (event.keyCode == 110) { // 'n' national rail
-			clearTimeout(currentTimeout);
+			clearTimeouts();
 			carousel2();
 		} else if (event.keyCode == 117) { // 'u' london underground
-			clearTimeout(currentTimeout);
+			clearTimeouts();
 			carousel1();
 		} else if (event.keyCode == 98) { // 'b' london bus
-			clearTimeout(currentTimeout);
+			clearTimeouts();
 			carousel3();
 		}	
 	});
