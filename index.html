@@ -32,7 +32,13 @@
 			<div class="col-sm-3" id=busG></div>
 			<div class="col-sm-3" id=busJ></div>
 			<div class="col-sm-3" id=busX></div>
+			<div class="col-sm-3" id=busRiver></div>
 		</div>
+	</div>
+	<div id=weather class=container-fluid style="position:fixed;">
+		<h4>Weather Updates</h4>
+		<div id=currentWeather class=container-fluid></div>
+		<div id=futureWeather class=container-fluid></div>
 	</div>
 </body>
 
@@ -314,6 +320,11 @@
 			if (output.length == 0){
 				return;
 			}
+
+			if(output[0].modeName == "river-bus") {
+				output[0].platformName = "River"
+			}
+
 			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3></div><div class='card-body'>";
 
 			var departuresDictionary = {};
@@ -342,6 +353,7 @@
 			    
 			cardHTML += "</div></div>"
 
+			
 			$("#bus"+output[0].platformName).html(cardHTML);
 		});
 	}
@@ -357,7 +369,8 @@
 			"490000247G1",
 			/*"490000247H", Terminating Services Only */
 			"490000247J",
-			"490005678X"
+			"490005678X",
+			"930GSGW"
 		];
 
 		for (var i = 0; i < stopIDs.length; i++) {
@@ -366,48 +379,98 @@
 	}
 
 	function updateWeather () {
-		var updateWeather = firebase.functions().httpsCallable('updateWeather');
-		updateWeather({}).then(function(result) {
+		var updateFutureWeather = firebase.functions().httpsCallable('updateFutureWeather');
+		var updateCurrentWeather = firebase.functions().httpsCallable('updateCurrentWeather');
+		updateFutureWeather({}).then(function(result) {
 			var output = JSON.parse(result.data);
 			console.log(output);
+			var weatherHTML = "<h6>Future Projections</h6><table class='table table-sm'><thead><tr><th scope='col'>Time</th><th scope='col'>Temperature</th><th scope='col'>Conditions</th><th scope='col'>Wind</th></tr></thead><tbody>";
+
+			for (var i = 0; i < Math.min(output.list.length,9); i++) {
+				var weatherDate = new Date(output.list[i].dt_txt);
+				weatherHTML+= "<tr><td>"+weatherDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})+"</td><td>"+Math.round(output.list[i].main.temp)+"°F</td><td>"+output.list[i].weather[0].description+"<img src=http://openweathermap.org/img/wn/" + output.list[i].weather[0].icon + ".png></td><td>Wind "+Math.round(output.list[i].wind.speed)+" mph</td></tr>";
+			}
+
+			weatherHTML += "</tbody></table>";
+
+			$("#futureWeather").html(weatherHTML);
+		});
+
+		updateCurrentWeather({}).then(function(result) {
+			var output = JSON.parse(result.data);
+			console.log(output);
+			var weatherHTML = "<h6>Current Weather</h6><div class=row><div><h1 class='display-1'>"+Math.round(output.main.temp)+"°F</h1><p>High "+Math.round(output.main.temp_max)+", Low "+Math.round(output.main.temp_min)+"</p></div><div><img src=http://openweathermap.org/img/wn/" + output.weather[0].icon + ".png>";
+		
+
+			$("#currentWeather").html(weatherHTML);
 		});
 	}
 
+	var currentTimeout;
+
+	function carousel0 () {
+		$("#vauxhallnr").fadeOut();
+		$("#busDepartures").fadeOut();
+		$("#vauxhallug").fadeOut();
+		$("#weather").fadeIn();
+		currentTimeout = setTimeout(function(){ carousel1(); }, 10000);
+	}
+
 	function carousel1 () {
+		$("#weather").fadeOut();
 		$("#vauxhallnr").fadeOut();
 		$("#busDepartures").fadeOut();
 		$("#vauxhallug").fadeIn();
-		setTimeout(function(){ carousel2(); }, 10000);
+		currentTimeout = setTimeout(function(){ carousel2(); }, 10000);
 	}
 
 	function carousel2 () {
+		$("#weather").fadeOut();
 		$("#vauxhallnr").fadeIn();
 		$("#busDepartures").fadeOut();
 		$("#vauxhallug").fadeOut();
-		setTimeout(function(){ carousel3(); }, 10000);
+		currentTimeout = setTimeout(function(){ carousel3(); }, 10000);
 	}
 
 	function carousel3 () {
+		$("#weather").fadeOut();
 		$("#vauxhallnr").fadeOut();
 		$("#busDepartures").fadeIn();
 		$("#vauxhallug").fadeOut();
-		setTimeout(function(){ carousel1(); }, 10000);
+		currentTimeout = setTimeout(function(){ carousel0(); }, 10000);
 	}
 
 	function updateAll () {
 		updateVauxhallUG();
 		updateVauxhallNR();
 		updateAllBuses();
+		updateWeather();
 	}
 
 	updateAll();
-	carousel1();
+	carousel0();
 	setInterval(updateAll, 50000);
 
 	function updateTime() {
 		$(".time").html(new Date().toLocaleTimeString());
 	}
 	setInterval(updateTime, 1000);
+
+	$(document).keypress(function(event){
+		if (event.keyCode == 119) { // 'w' weather
+			clearTimeout(currentTimeout);
+			carousel0();
+		} else if (event.keyCode == 110) { // 'n' national rail
+			clearTimeout(currentTimeout);
+			carousel2();
+		} else if (event.keyCode == 117) { // 'u' london underground
+			clearTimeout(currentTimeout);
+			carousel1();
+		} else if (event.keyCode == 98) { // 'b' london bus
+			clearTimeout(currentTimeout);
+			carousel3();
+		}	
+	});
 
 </script>
 
