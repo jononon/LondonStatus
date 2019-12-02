@@ -45,7 +45,13 @@
 		<div id=currentWeather class=container-fluid></div>
 		<div id=futureWeather class=container-fluid></div>
 	</div>
-	<div id="bottom"></div>
+	<div id="bottom" style="height:36px;"></div>
+	<div style="position: fixed;bottom: 5px;left: 5px;">
+		<button type="button" class="btn btn-light btn-sm" onclick="clearTimeouts();carousel0()">View Weather</button> 
+		<button type="button" class="btn btn-light btn-sm" onclick="clearTimeouts();carousel1()">View Underground Status</button> 
+		<button type="button" class="btn btn-light btn-sm" onclick="clearTimeouts();carousel2()">View National Rail Status</button> 
+		<button type="button" class="btn btn-light btn-sm" onclick="clearTimeouts();carousel3()">View Live Bus Departures</button>
+	</div>
 </body>
 
 <!-- The core Firebase JS SDK is always required and must be listed first -->
