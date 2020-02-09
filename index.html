@@ -304,7 +304,14 @@
 					delayReason = output[i]["lt4:delayReason"]["_text"];
 				}
 
-				html += "<tr><td>"+etdHTML+"</td><td>"+output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"]+"</td><td>Platform "+output[i]["lt4:platform"]["_text"]+"</td><td width='30%'><marquee>"+delayReason+"</marquee></td><td style='text-align:right;'>"+minutesUntil+"</td></tr>"
+				var platform;
+				if(output[i]["lt4:platform"] == undefined) {
+					platform = "";
+				} else {
+					platform = "Platform "+output[i]["lt4:platform"]["_text"];
+				}
+
+				html += "<tr><td>"+etdHTML+"</td><td>"+output[i]["lt5:destination"]["lt4:location"]["lt4:locationName"]["_text"]+"</td><td>"+platform+"</td><td width='30%'><marquee>"+delayReason+"</marquee></td><td style='text-align:right;'>"+minutesUntil+"</td></tr>"
 
 				// if(output[i]["lt4:delayReason"] != undefined) {
 					// html += "<tr valign='height:5px;'><td colspan=5 valign='top'><small class='text-muted'>"+output[i]["lt4:delayReason"]["_text"]+"</small></td></tr>";
