@@ -63,6 +63,18 @@
 		      <td id=camden_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
 		      <td id=camden_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
 		    </tr>
+		    <tr>
+		      <th scope="row">Heathrow Airport</th>
+		      <td id=heathrow_bike>-</td>
+		      <td id=heathrow_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=heathrow_walk>-</td>
+		    </tr>
+		    <tr>
+		      <th scope="row">Gatwick Airport</th>
+		      <td id=gatwick_bike>-</td>
+		      <td id=gatwick_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=gatwick_walk>-</td>
+		    </tr>
 		  </tbody>
 		</table>
 	</div>
@@ -568,7 +580,9 @@
 			{ id: "maughan_transit", origin: "SW1X 0HT", destination: "King's College London, Maughan Library", mode: "transit" },
 			{ id: "camden_walk", origin: "SW1X 0HT", destination: "Camden Market", mode: "walking" },
 			{ id: "camden_bike", origin: "SW1X 0HT", destination: "Camden Market", mode: "bicycling" },
-			{ id: "camden_transit", origin: "SW1X 0HT", destination: "Camden Market", mode: "transit" }
+			{ id: "camden_transit", origin: "SW1X 0HT", destination: "Camden Market", mode: "transit" },
+			{ id: "heathrow_transit", origin: "SW1X 0HT", destination: "Heathrow Terminal 5", mode: "transit" },
+			{ id: "gatwick_transit", origin: "SW1X 0HT", destination: "Gatwick Airport South", mode: "transit" }
 		];
 
 		for(var i = 0; i < queries.length; i++) {
@@ -598,8 +612,6 @@
 				if(isTransit) {
 					$("#" + result.data.id).append(stepsHTMLStrings.join(" <i class=\"fas fa-arrow-right\"></i> "));
 				}
-
-
 			});
 		}
 	}
