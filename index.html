@@ -64,6 +64,24 @@
 		      <td id=camden_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
 		    </tr>
 		    <tr>
+		      <th scope="row">Kingly Court</th>
+		      <td id=kingly_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=kingly_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=kingly_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		    </tr>
+		    <tr>
+		      <th scope="row">Covent Garden</th>
+		      <td id=coventgarden_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=coventgarden_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=coventgarden_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		    </tr>
+		    <tr>
+		      <th scope="row">South Kensington</th>
+		      <td id=southken_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=southken_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		      <td id=southken_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
+		    </tr>
+		    <tr>
 		      <th scope="row">Heathrow Airport</th>
 		      <td id=heathrow_bike>-</td>
 		      <td id=heathrow_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
@@ -582,8 +600,19 @@
 			{ id: "camden_bike", origin: "SW1X 0HT", destination: "Camden Market", mode: "bicycling" },
 			{ id: "camden_transit", origin: "SW1X 0HT", destination: "Camden Market", mode: "transit" },
 			{ id: "heathrow_transit", origin: "SW1X 0HT", destination: "Heathrow Terminal 5", mode: "transit" },
-			{ id: "gatwick_transit", origin: "SW1X 0HT", destination: "Gatwick Airport South", mode: "transit" }
+			{ id: "gatwick_transit", origin: "SW1X 0HT", destination: "Gatwick Airport South", mode: "transit" },
+			{ id: "kingly_walk", origin: "SW1X 0HT", destination: "Kingly Court", mode: "walking" },
+			{ id: "kingly_bike", origin: "SW1X 0HT", destination: "Kingly Court", mode: "bicycling" },
+			{ id: "kingly_transit", origin: "SW1X 0HT", destination: "Kingly Court", mode: "transit" },
+			{ id: "coventgarden_bike", origin: "SW1X 0HT", destination: "Covent Garden", mode: "walking" },
+			{ id: "coventgarden_transit", origin: "SW1X 0HT", destination: "Covent Garden", mode: "bicycling" },
+			{ id: "coventgarden_walk", origin: "SW1X 0HT", destination: "Covent Garden", mode: "transit" },
+			{ id: "southken_bike", origin: "SW1X 0HT", destination: "South Kensington Station", mode: "walking" },
+			{ id: "southken_transit", origin: "SW1X 0HT", destination: "South Kensington Station", mode: "bicycling" },
+			{ id: "southken_walk", origin: "SW1X 0HT", destination: "South Kensington Station", mode: "transit" }
 		];
+
+
 
 		for(var i = 0; i < queries.length; i++) {
 			getDirections({
