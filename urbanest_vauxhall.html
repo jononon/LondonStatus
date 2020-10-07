@@ -10,8 +10,6 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
 	<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.0/css/all.css" integrity="sha384-lKuwvrZot6UHsBSfcMvOkWwlCMgc0TaWr+30HWe3a4ltaBwTZhyTEggF5tJv8tbt" crossorigin="anonymous">
-
 	<title>London Status Page</title>
 </head>
 <style>
@@ -19,64 +17,27 @@
 </style>
 <body>
 	<div id="top"></div>
-	<div id=ug class=container-fluid>
-		<h3>Knightsbridge Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
-		<div id=knightsbridgeugdepartures class=container-fluid></div>
-		<h3>Sloane Square Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'></span></h3>
-		<div id=sloanesquareugdepartures class=container-fluid></div>
+	<div id=vauxhallug class=container-fluid >
+		<h3>Vauxhall Underground Arrivals <img src='images/tube-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
+		<div id=vauxhallugdepartures class=container-fluid></div>
 		<h3>Underground Status</h3>
-		<div id=ugstatus class=container-fluid></div>
+		<div id=vauxhallugstatus class=container-fluid></div>
 	</div>
-	<div id=commute class=container-fluid >
-		<h3>Commute Times <i class="fas fa-route"></i><span style='float:right;' class=time></span></h3>
-		<table class="table">
-		  <thead>
-		    <tr>
-		      <th scope="col">Destination</th>
-		      <th scope="col"><i class="fas fa-bicycle"></i></th>
-		      <th scope="col"><i class="fas fa-subway"></i></th>
-		      <th scope="col"><i class="fas fa-walking"></i></th>
-		    </tr>
-		  </thead>
-		  <tbody>
-		    <tr>
-		      <th scope="row">KCL, Strand</th>
-		      <td id=strand_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=strand_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=strand_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		    </tr>
-		    <tr>
-		      <th scope="row">KCL, Waterloo</th>
-		      <td id=waterloo_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=waterloo_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=waterloo_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		    </tr>
-		    <tr>
-		      <th scope="row">KCL, Maughan</th>
-		      <td id=maughan_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=maughan_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=maughan_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		    </tr>
-		    <tr>
-		      <th scope="row">Camden Market</th>
-		      <td id=camden_bike><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=camden_transit><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		      <td id=camden_walk><div class="spinner-grow spinner-grow-sm text-secondary" role="status"></div></td>
-		    </tr>
-		  </tbody>
-		</table>
-	</div>
+	<div id=vauxhallnr class=container-fluid ></div>
 	<div id=busDepartures class=container-fluid >
 		<h3>Local Bus Departures <img src='images/buses-partner.png' width='30' height='25' align='middle'><span style='float:right;' class=time></span></h3>
 		<div class=row>
-			<div class="col-sm-6" id=busKM></div>
-			<div class="col-sm-6" id=busKL></div>
-		</div>
-		<div id="mid"></div>
-		<h3>Bikes <img src='images/sc-partner.png' height='25' align='middle'></span></h3>
-		<div class=row>
-			<div class="col-sm-12" id=bikes_BikePoints_143></div>
-			<div class="col-sm-12" id=bikes_BikePoints_211></div>
+			<div class="col-sm-3" id=busA></div>
+			<div class="col-sm-3" id=busB></div>
+			<div class="col-sm-3" id=busC></div>
+			<div class="col-sm-3" id=busD></div>
+			<div class="col-sm-3" id=busE></div>
+			<div class="col-sm-3" id=busF></div>
+			<div class="col-sm-3" id=busG></div>
+			<div class="col-sm-3" id=busJ></div>
+			<div id="mid"></div>
+			<div class="col-sm-3" id=busX></div>
+			<div class="col-sm-3" id=busRiver></div>
 		</div>
 	</div>
 	<div id=weather class=container-fluid >
@@ -115,16 +76,16 @@
 		return a.timeToStation - b.timeToStation;
 	}
 
-	function updateKnightsbridgeUG () {
+	function updateVauxhallUG () {
 		var updateStoppoint = firebase.functions().httpsCallable('updateStoppoint');
-		updateStoppoint({stopID: "940GZZLUKNB"}).then(function(result) {
+		updateStoppoint({stopID: "940GZZLUVXL"}).then(function(result) {
 			var output = JSON.parse(result.data);
 
 			var platform1 = [];
 			var platform2 = [];
 
 			for (var i = 0; i < output.length; i++) {
-				if(output[i].platformName == "Eastbound - Platform 1") {
+				if(output[i].platformName == "Northbound - Platform 1") {
 					platform1.push(output[i]);
 				} else {
 					platform2.push(output[i]);
@@ -134,86 +95,24 @@
 			platform1.sort(compareArrivals);
 			platform2.sort(compareArrivals);
 
-			var html = "<div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Eastbound</small></h4><table width='100%'><tbody>";
+			var html = "<div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Northbound</small></h4><table width='100%'><tbody>";
 
 			for (var i = 0; i < Math.min(platform1.length,6); i++) {
-				html += "<tr><td style='width:140px;'><span class=\"badge badge-pill badge-secondary\" style=\"background-color:" + getLineColor(platform1[i].lineId) + "\">" + platform1[i].lineName + " </span></td><td>"+platform1[i].towards+"</td><td style='text-align:right;'><b>"+Math.round(platform1[i].timeToStation/60)+" mins</b></td></tr>";
+				html += "<tr><td>"+platform1[i].towards+"</td><td style='text-align:right;'>"+Math.round(platform1[i].timeToStation/60)+" mins</td></tr>";
 			}
 
-			html += "</tbody></table></div><div class='col'><h4>Platform 2 <small class='text-muted'>Westbound</small></h4><table width='100%'><tbody>";
+			html += "</tbody></table></div><div class='col'><h4>Platform 2 <small class='text-muted'>Southbound</small></h4><table width='100%'><tbody>";
 
 			for (var i = 0; i < Math.min(platform2.length,6); i++) {
-				html += "<tr><td style='width:140px;'><span class=\"badge badge-pill badge-secondary\" style=\"background-color:" + getLineColor(platform2[i].lineId) + "\">" + platform2[i].lineName + " </span></td><td>"+platform2[i].towards+"</td><td style='text-align:right;'><b>"+Math.round(platform2[i].timeToStation/60)+" mins</b></td></tr>";
+				html += "<tr><td>"+platform2[i].towards+"</td><td style='text-align:right;'>"+Math.round(platform2[i].timeToStation/60)+" mins</td></tr>";
 			}
 
 			html += "</tbody></table></div></div></div>";
 
-			$("#knightsbridgeugdepartures").html(html);
+			$("#vauxhallugdepartures").html(html);
 
 		});
 
-	}
-
-	function getLineColor (lineID) {
-		switch (lineID) {
-			case "district":
-				return "rgb(0,125,50)";
-				break;
-			case "circle":
-				return "rgb(255,211,41)";
-				break;
-			case "piccadilly":
-				return "rgb(0,25,168)";
-				break;
-			case "hammersmith-city":
-				return "rgb(244,169,190)";
-				break;
-			default:
-				return "#6c757d";
-				break;
-		}
-	}
-
-	function updateSloaneSquareUG () {
-		var updateStoppoint = firebase.functions().httpsCallable('updateStoppoint');
-		updateStoppoint({stopID: "940GZZLUSSQ"}).then(function(result) {
-			var output = JSON.parse(result.data);
-
-			var platform1 = [];
-			var platform2 = [];
-
-			for (var i = 0; i < output.length; i++) {
-				if(output[i].platformName == "Westbound - Platform 1") {
-					platform1.push(output[i]);
-				} else {
-					platform2.push(output[i]);
-				}
-			}
-
-			platform1.sort(compareArrivals);
-			platform2.sort(compareArrivals);
-
-			var html = "<div class='container-fluid'><div class='row'><div class='col'><h4>Platform 1 <small class='text-muted'>Westbound</small></h4><table width='100%'><tbody>";
-
-			for (var i = 0; i < Math.min(platform1.length,6); i++) {
-				html += "<tr><td style='width:140px;'><span class=\"badge badge-pill badge-secondary\" style=\"background-color:" + getLineColor(platform1[i].lineId) + "\">" + platform1[i].lineName + " </span></td><td>"+platform1[i].towards+"</td><td style='text-align:right;'><b>"+Math.round(platform1[i].timeToStation/60)+" mins</b></td></tr>";
-			}
-
-			html += "</tbody></table></div><div class='col'><h4>Platform 2 <small class='text-muted'>Eastbound</small></h4><table width='100%'><tbody>";
-
-			for (var i = 0; i < Math.min(platform2.length,6); i++) {
-				html += "<tr><td style='width:140px;'><span class=\"badge badge-pill badge-secondary\" style=\"background-color:" + getLineColor(platform2[i].lineId) + "\">" + platform2[i].lineName + " </span></td><td>"+platform2[i].towards+"</td><td style='text-align:right;'><b>"+Math.round(platform2[i].timeToStation/60)+" mins</b></td></tr>";
-			}
-
-			html += "</tbody></table></div></div></div>";
-
-			$("#sloanesquareugdepartures").html(html);
-
-		});
-
-	}
-
-	function updateUGStatus() {
 		function compareStatuses (a, b) {
 			return a.minStatus - b.minStatus;
 		}
@@ -275,7 +174,7 @@
 				statusHTML += "<p><strong>There is a good service on all London Undergrond Lines.</strong></p>";
 			}
 
-			$("#ugstatus").html(statusHTML);
+			$("#vauxhallugstatus").html(statusHTML);
 
 		});
 		
@@ -440,7 +339,7 @@
 				output[0].platformName = "River"
 			}
 
-			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3> <h6>Towards " + output[0].towards + "</h6></div><div class='card-body'>";
+			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h3><span class='badge badge-danger'>"+output[0].platformName+"</span></h3></div><div class='card-body'>";
 
 			var departuresDictionary = {};
 
@@ -475,56 +374,22 @@
 
 	function updateAllBuses () {
 		var stopIDs = [
-			"490011097S",
-			"490011097N"
+			"490000247A",
+			"490000247B",
+			"490000247C",
+			"490000247D",
+			"490000247E",
+			"490000247F",
+			"490000247G1",
+			/*"490000247H", Terminating Services Only */
+			"490000247J",
+			"490005678X",
+			"930GSGW"
 		];
 
 		for (var i = 0; i < stopIDs.length; i++) {
 			updateBus(stopIDs[i]);
 		}
-	}
-
-	function updateBikes (bikePointID) {
-		var updateBikepoint = firebase.functions().httpsCallable('updateBikepoint');
-		updateBikepoint({bikePointID: bikePointID}).then(function(result) {
-			var output = JSON.parse(result.data);
-			if (output.length == 0){
-				return;
-			}
-
-			var cardHTML = "<div class='card' style='width: 100%;margin-bottom:20px;'><div class='card-header'><h5>" + output.commonName + "</h5></div><div class='card-body'>";
-
-			var availableBikes;
-			var emptyDocks;
-
-			for (var i = 0; i < output.additionalProperties.length; i++) {
-				if(output.additionalProperties[i].key == "NbBikes") {
-					availableBikes = parseInt(output.additionalProperties[i].value);
-				} else if(output.additionalProperties[i].key == "NbEmptyDocks") {
-					emptyDocks = parseInt(output.additionalProperties[i].value);
-				}
-			}
-
-			var totalDocks = availableBikes + emptyDocks;
-
-			var percentAvailable = availableBikes / totalDocks * 100;
-
-			cardHTML += "<div><p style=\"width:100%\">Available Bikes<span style=\"float:right\">Empty Docks</span></p><h4 style=\"width:100%\">" + availableBikes + "<span style=\"float:right\">" + emptyDocks + "</span></h4></div><div class=\"progress\"><div class=\"progress-bar bg-danger\" role=\"progressbar\" style=\"width: " + percentAvailable + "%\" aria-valuenow=\"" + percentAvailable + "\" aria-valuemin=\"0\" aria-valuemax=\"100\"></div></div></div></div>";
-			
-			$("#bikes_" + output.id).html(cardHTML);
-		});
-	}
-
-	function updateAllBikes () {
-		var bikePointIDs = [
-			"BikePoints_143",
-			"BikePoints_211"
-		];
-
-		for (var i = 0; i < bikePointIDs.length; i++) {
-			updateBikes(bikePointIDs[i]);
-		}
-		
 	}
 
 	function updateWeather () {
@@ -553,57 +418,6 @@
 		});
 	}
 
-	function updateCommute() {
-		var getDirections = firebase.functions().httpsCallable('getDirections');
-
-		var queries = [
-			{ id: "strand_walk", origin: "SW1X 0HT", destination: "King's College London, Strand", mode: "walking" },
-			{ id: "strand_bike", origin: "SW1X 0HT", destination: "King's College London, Strand", mode: "bicycling" },
-			{ id: "strand_transit", origin: "SW1X 0HT", destination: "King's College London, Strand", mode: "transit" },
-			{ id: "waterloo_walk", origin: "SW1X 0HT", destination: "King's College London, Waterloo", mode: "walking" },
-			{ id: "waterloo_bike", origin: "SW1X 0HT", destination: "King's College London, Waterloo", mode: "bicycling" },
-			{ id: "waterloo_transit", origin: "SW1X 0HT", destination: "King's College London, Waterloo", mode: "transit" },
-			{ id: "maughan_walk", origin: "SW1X 0HT", destination: "King's College London, Maughan Library", mode: "walking" },
-			{ id: "maughan_bike", origin: "SW1X 0HT", destination: "King's College London, Maughan Library", mode: "bicycling" },
-			{ id: "maughan_transit", origin: "SW1X 0HT", destination: "King's College London, Maughan Library", mode: "transit" },
-			{ id: "camden_walk", origin: "SW1X 0HT", destination: "Camden Market", mode: "walking" },
-			{ id: "camden_bike", origin: "SW1X 0HT", destination: "Camden Market", mode: "bicycling" },
-			{ id: "camden_transit", origin: "SW1X 0HT", destination: "Camden Market", mode: "transit" }
-		];
-
-		for(var i = 0; i < queries.length; i++) {
-			getDirections({
-				origin: queries[i].origin,
-				destination: queries[i].destination,
-				mode: queries[i].mode,
-				id: queries[i].id
-			}).then(function(result) {
-				var output = JSON.parse(result.data.body);
-				$("#" + result.data.id).html("<p>" + output.routes[0].legs[0].duration.text + "</p>");
-
-				var isTransit = false;
-				var stepsHTMLStrings = [];
-				for(var j = 0; j < output.routes[0].legs[0].steps.length; j++) {
-					if(output.routes[0].legs[0].steps[j].travel_mode == "WALKING") {
-						if(output.routes[0].legs[0].steps[j].duration.value > 200) {
-							stepsHTMLStrings.push("<i class=\"fas fa-walking\"></i> " + output.routes[0].legs[0].steps[j].duration.text);
-
-						}
-					} else if(output.routes[0].legs[0].steps[j].travel_mode == "TRANSIT") {
-						isTransit = true;
-						stepsHTMLStrings.push("<img height=20 src=\"https://" + output.routes[0].legs[0].steps[j].transit_details.line.vehicle.local_icon + "\"> <span class=\"badge badge-pill badge-secondary\" style=\"background-color:" + output.routes[0].legs[0].steps[j].transit_details.line.color + ";color:" + output.routes[0].legs[0].steps[j].transit_details.line.text_color + "\">" + output.routes[0].legs[0].steps[j].transit_details.line.name + " </span> " + output.routes[0].legs[0].steps[j].duration.text);
-					}
-				}
-
-				if(isTransit) {
-					$("#" + result.data.id).append(stepsHTMLStrings.join(" <i class=\"fas fa-arrow-right\"></i> "));
-				}
-
-
-			});
-		}
-	}
-
 	var currentScrollTimeout;
 
 	function goToBottom() {
@@ -619,6 +433,7 @@
 	};
 
 	function goToMiddle() {
+		console.log("mid");
 	    document.querySelector('#mid').scrollIntoView({ 
 		  behavior: 'smooth' 
 		});
@@ -629,11 +444,11 @@
 	var currentTimeout;
 
 	function carousel0 () {
-		$("#commute").fadeOut(300);
+		$("#vauxhallnr").fadeOut();
 		$("#busDepartures").fadeOut(300, function() {
-			$("#weather").fadeIn(300);
+			$("#weather").fadeIn();
 		});
-		$("#ug").fadeOut(300);
+		$("#vauxhallug").fadeOut();
 		currentTimeout = setTimeout(function(){ carousel1(); }, 10000);
 		currentScrollTimeout = setTimeout( function () { goToBottom(); }, 5000 );
 		goToTop();
@@ -641,9 +456,9 @@
 
 	function carousel1 () {
 		$("#weather").fadeOut(300, function() {
-			$("#ug").fadeIn(300);
+			$("#vauxhallug").fadeIn();
 		});
-		$("#commute").fadeOut(300);
+		$("#vauxhallnr").fadeOut(300);
 		$("#busDepartures").fadeOut(300);
 		
 		currentTimeout = setTimeout(function(){ carousel2(); }, 10000);
@@ -652,34 +467,32 @@
 	}
 
 	function carousel2 () {
-		$("#weather").fadeOut(300);
-		$("#busDepartures").fadeOut(300);
-		$("#ug").fadeOut(300, function() {
-			$("#commute").fadeIn(300);
+		$("#weather").fadeOut();
+		$("#busDepartures").fadeOut();
+		$("#vauxhallug").fadeOut(300, function() {
+			$("#vauxhallnr").fadeIn();
 		});
 		currentTimeout = setTimeout(function(){ carousel3(); }, 10000);
 		currentScrollTimeout = setTimeout( function () { goToBottom(); }, 5000 );
-		goToTop();	}
+		goToTop();
+	}
 
 	function carousel3 () {
-		$("#weather").fadeOut(300);
-		$("#commute").fadeOut(300, function() {
-			$("#busDepartures").fadeIn(300);
+		$("#weather").fadeOut();
+		$("#vauxhallnr").fadeOut(300, function() {
+			$("#busDepartures").fadeIn();
 		});
-		$("#ug").fadeOut(300);
+		$("#vauxhallug").fadeOut();
 		currentTimeout = setTimeout(function(){ carousel0(); }, 10000);
 		currentScrollTimeout = setTimeout( function () { goToMiddle(); }, 3333 );	
 		goToTop();
 	}
 
 	function updateAll () {
-		updateKnightsbridgeUG();
-		updateSloaneSquareUG();
-		updateUGStatus();
+		updateVauxhallUG();
+		updateVauxhallNR();
 		updateAllBuses();
-		updateAllBikes();
 		updateWeather();
-		updateCommute();
 	}
 
 	updateAll();
