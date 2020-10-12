@@ -300,9 +300,9 @@
 			statusHTML += "</tbody></table>";
 
 			if(impactedLines > 0) {
-				statusHTML += "<p><strong>There is a good service on all other London Undergrond Lines.</strong></p>";
+				statusHTML += "<p><strong>There is a good service on all other London Underground Lines.</strong></p>";
 			} else {
-				statusHTML += "<p><strong>There is a good service on all London Undergrond Lines.</strong></p>";
+				statusHTML += "<p><strong>There is a good service on all London Underground Lines.</strong></p>";
 			}
 
 			$("#ugstatus").html(statusHTML);
@@ -693,14 +693,16 @@
 	}
 
 	function carousel2 () {
-		$("#weather").fadeOut(300);
-		$("#busDepartures").fadeOut(300);
-		$("#ug").fadeOut(300, function() {
-			$("#commute").fadeIn(300);
-		});
-		currentTimeout = setTimeout(function(){ carousel3(); }, 10000);
-		currentScrollTimeout = setTimeout( function () { goToBottom(); }, 5000 );
-		goToTop();	}
+		// $("#weather").fadeOut(300);
+		// $("#busDepartures").fadeOut(300);
+		// $("#ug").fadeOut(300, function() {
+		// 	$("#commute").fadeIn(300);
+		// });
+		// currentTimeout = setTimeout(function(){ carousel3(); }, 10000);
+		// currentScrollTimeout = setTimeout( function () { goToBottom(); }, 5000 );
+		// goToTop();
+		carousel3();	
+	}
 
 	function carousel3 () {
 		$("#weather").fadeOut(300);
@@ -720,7 +722,7 @@
 		updateAllBuses();
 		updateAllBikes();
 		updateWeather();
-		updateCommute();
+		//updateCommute();
 	}
 
 	updateAll();
